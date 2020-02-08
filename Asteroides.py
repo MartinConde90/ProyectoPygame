@@ -6,7 +6,7 @@ class Meteor(pg.sprite.Sprite):
     picture = ["G17.png" ,"F17.png","E16.png","D15.png" ,"C5.png","B13.png","A3.png"]
      
     speed = randint(1,6)
-   
+    contador = 0
     def __init__(self, x=randint(800,1000), y=randint(10, 550)):
         self.x = x
         self.y = y
@@ -23,8 +23,9 @@ class Meteor(pg.sprite.Sprite):
 
     def update(self, dt):
         self.rect.x = self.rect.x - self.speed 
-
+        
         if self.rect.x <=  0 - self.w: 
-                self.kill() 
-                del self 
+            self.contador += 1
+            self.kill() 
+            del self 
         
