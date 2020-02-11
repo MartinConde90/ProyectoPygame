@@ -239,15 +239,13 @@ class Game:
           
             self.livescounter = self.font.render(str(self.vidas), True, WHITE)
             
-            if self.vidas > 0:
-                self.colision = pg.sprite.groupcollide(self.player_group, self.asteroid_group, True, False) 
+            if self.vidas > 1:
+                self.colision = pg.sprite.groupcollide(self.asteroid_group, self.player_group, True, False  ) 
                 for hit in self.colision:
                     expl = Explosion(hit.rect.center)
                     self.run5()
                     self.all_group.add(expl)   
-                    self.ship = Nave(10, 300)
-                    self.player_group.add(self.ship)
-                    self.all_group.add(self.player_group)    
+                        
                     self.contador += 1
                 if self.contador > 0:              
                     self.vidas -= 1
@@ -278,8 +276,7 @@ class Game:
             self.screen.blit(self.livescounter, (50, 10))
             self.screen.blit(self.marcador, (685, 10))
 
-            if self.vidas == 0:
-                self.gameOver()
+            
 
             pg.display.flip()
         self.quitGame()
