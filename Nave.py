@@ -7,7 +7,7 @@ candidatos = 0
 class Nave(pg.sprite.Sprite):
     pictures = 'nave.png'
     speed = 10
-    lives = 1
+    lives = 5
     #contador = 0
     def __init__(self, x=10, y=300):
         self.x = x

@@ -57,7 +57,7 @@ class Game:
 
         self.ship = Nave(10, 300)
         self.player_group.add(self.ship)
-        self.vidas = 5
+        #self.ship.lives = 5
         self.contador = 0      
 
         self.all_group.add(self.ship, self.asteroid_group)
@@ -67,16 +67,17 @@ class Game:
         self.meteor_creados = 0
         self.ultimo_meteor = FPS * 12
         self.nuevo_meteor = FPS// 4
+        #self.run6()
         #self.run5()
         #self.run4()
         #self.run3()
         #self.run2()
-        #self.run1()
+        self.run1()
         
 
     def run1(self):
         pg.mixer.init()
-        pg.mixer.music.load('resources/sounds/Tune.mp3')
+        pg.mixer.music.load('resources/sounds/menu.mp3')
         pg.mixer.music.play()
     def run2(self):
         pg.mixer.init()
@@ -84,7 +85,7 @@ class Game:
         pg.mixer.music.play()
     def run3(self):
         pg.mixer.init()
-        pg.mixer.music.load('resources/sounds/FX2.mp3')
+        pg.mixer.music.load('resources/sounds/back.mp3')
         pg.mixer.music.play()
     def run4(self):
         pg.mixer.init()
@@ -93,6 +94,10 @@ class Game:
     def run5(self):
         pg.mixer.init()
         pg.mixer.music.load('resources/sounds/explosion.mp3')
+        pg.mixer.music.play()
+    def run6(self):
+        pg.mixer.init()
+        pg.mixer.music.load('resources/sounds/story.mp3')
         pg.mixer.music.play()
 
     def nuevoMeteor(self,dt):
@@ -150,18 +155,19 @@ class Game:
 
                 if event.type == KEYDOWN:
                         if event.key == K_i:
-                            #self.run3()
+                            self.run3()
                             self.rules_screen()
                             return
                
                         if event.key == K_SPACE:                                    
-                            #self.run4()        
+                            self.run4()        
                             self.mainloop()
                             
                             return
                 
                         if event.key == K_s:
                             #self.run3()
+                            self.run6()
                             self.Story_screen()
                             return
 
@@ -189,6 +195,7 @@ class Game:
                 if event.type == KEYDOWN:
                         if event.key == K_SPACE:
                             #self.run2() 
+                            self.run1()
                             self.start_screen()
                             return
                 
@@ -206,6 +213,7 @@ class Game:
                 if event.type == KEYDOWN:
                         if event.key == K_SPACE:
                             #self.run2()
+                            self.run1()
                             self.start_screen()
                             return
                 
@@ -237,9 +245,9 @@ class Game:
             
             self.handleEvents()
           
-            self.livescounter = self.font.render(str(self.vidas), True, WHITE)
+            self.livescounter = self.font.render(str(self.ship.lives), True, WHITE)
             
-            if self.vidas > 1:
+            if self.ship.lives > 1:
                 self.colision = pg.sprite.groupcollide(self.asteroid_group, self.player_group, True, False  ) 
                 for hit in self.colision:
                     expl = Explosion(hit.rect.center)
@@ -248,10 +256,10 @@ class Game:
                         
                     self.contador += 1
                 if self.contador > 0:              
-                    self.vidas -= 1
+                    self.ship.lives -= 1
             self.contador = 0
 
-            if self.vidas == 1:
+            if self.ship.lives == 1:
                 self.colision = pg.sprite.groupcollide(self.player_group, self.asteroid_group, True, False)
                 for hit in self.colision:
                     expl = Explosion(hit.rect.center)
@@ -259,9 +267,9 @@ class Game:
                     self.all_group.add(expl)   
                     self.contador += 1
                 if self.contador > 0:              
-                    self.vidas -= 1
+                    self.ship.lives -= 1
 
-            print(self.vidas)
+            print(self.ship.lives)
             self.screen.blit(self.background_img,(0,0))           
                    
             self.all_group.update(dt)
