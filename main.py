@@ -12,7 +12,7 @@ GREEN = (38, 158, 41)
 FUCSIA = (236, 52, 234)
 RED = (229, 9, 9)
 WHITE = (255, 255, 255)
-
+AZUL = (255, 131, 0)
 class Game:
     clock = pg.time.Clock()
 
@@ -39,6 +39,18 @@ class Game:
         self.text_text = self.font.render("Comienza tu aventura", True, GREEN)      
         self.text_gameOver = self.fontGran.render("GAME OVER", True, RED)       
         self.text_titulo = self.font.render("THE QUEST", True, GREEN)
+        
+        self.text_historia1 = self.fontR.render("Cuaderno de bitacora: La humanidad, en el culmen de su abandono por el  ", True, AZUL)
+        self.text_historia2 = self.fontR.render("cuidado del planeta que les dio la vida, ha acabado con todos los recursos", True, AZUL)
+        self.text_historia3 = self.fontR.render("que este ofrecia. Tras decadas de guerras por controlar la", True, AZUL)
+        self.text_historia4 = self.fontR.render("poco agua potable que quedaba, un invierno nuclear ha terminado", True, AZUL)
+        self.text_historia5 = self.fontR.render("por destruir todo el ecosistema terrestre mermado ya por el cambio", True, AZUL)
+        self.text_historia6 = self.fontR.render(" climatico. En un ultimo esfuerzo, las naciones supervivientes han", True, AZUL)
+        self.text_historia7 = self.fontR.render("unido fuerzas y construido la ultima obra maestra de ingenieria humana. ", True, AZUL)
+        self.text_historia8 = self.fontR.render("Una nave espacial con la capacidad de realizar viajes interestelares.", True, AZUL)
+        self.text_historia9 = self.fontR.render("Eres lo mejor que tenemos, todas nuestras esperanzas recaen en ti. ", True, AZUL)
+        self.text_historia10 = self.fontR.render("Encuentranos un nuevo hogar.", True, AZUL)
+
 
         self.text_controlesU = self.fontR.render("Pulsa           para    subir", True, GREEN)
         self.text_controlesD = self.fontR.render("Pulsa           para    bajar", True, GREEN)
@@ -54,7 +66,7 @@ class Game:
 
         self.meteorito = Meteor()
         self.asteroid_group.add(self.meteorito)
-
+    
         self.ship = Nave(10, 300)
         self.player_group.add(self.ship)
         #self.ship.lives = 5
@@ -205,9 +217,20 @@ class Game:
     
     def Story_screen(self):
         while True:
-            self.screen.blit(self.background_story,(-300,-150))
+            self.screen.blit(self.background_story,(0,0))
             rect = self.text_return.get_rect()
             self.screen.blit(self.text_return,((800 - rect.w)//2,560))
+            self.screen.blit(self.text_historia1,(50, 25))
+            self.screen.blit(self.text_historia2,(50, 75))
+            self.screen.blit(self.text_historia3,(50, 125))
+            self.screen.blit(self.text_historia4,(50, 175))
+            self.screen.blit(self.text_historia5,(50, 225))
+            self.screen.blit(self.text_historia6,(50, 275))
+            self.screen.blit(self.text_historia7,(50, 325))
+            self.screen.blit(self.text_historia8,(50, 375))
+            self.screen.blit(self.text_historia9,(50, 425))
+            self.screen.blit(self.text_historia10,(230, 475))
+            
             pg.display.update()
             for event in pg.event.get():
                 if event.type == KEYDOWN:
