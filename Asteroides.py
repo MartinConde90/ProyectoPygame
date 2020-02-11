@@ -23,12 +23,13 @@ class Meteor(pg.sprite.Sprite):
         self.h = self.rect.h
 
     def update(self, dt):
-        self.rect.x = self.rect.x - self.speed 
-        
+        self.rect.x = self.rect.x - self.speed        
         if self.rect.x <=  0 - self.w:           
             self.kill() 
             del self 
     
+    def test_collide(self, group):
+        self.candidatos = pg.sprite.spritecollide(self, group, True)
     
     
         

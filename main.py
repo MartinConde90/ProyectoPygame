@@ -49,8 +49,7 @@ class Game:
         self.text_story = self.fontR.render("Press S  to know your story", True, WHITE)
         
         self.player_group = pg.sprite.Group()
-        self.asteroid_group = pg.sprite.Group()
-        self.explode_group = pg.sprite.Group()
+        self.asteroid_group = pg.sprite.Group()      
         self.all_group = pg.sprite.Group()
 
         self.meteorito = Meteor()
@@ -58,11 +57,8 @@ class Game:
 
         self.ship = Nave(10, 300)
         self.player_group.add(self.ship)
-
-        self.kboom = Explosion()
-        self.explode_group.add(self.kboom)
-        
-        
+        self.vidas = 5
+        self.contador = 0      
 
         self.all_group.add(self.ship, self.asteroid_group)
         self.default_font = pg.font.Font(None, 28)
@@ -71,11 +67,12 @@ class Game:
         self.meteor_creados = 0
         self.ultimo_meteor = FPS * 12
         self.nuevo_meteor = FPS// 4
+        #self.run5()
         #self.run4()
         #self.run3()
         #self.run2()
-        self.run1()
-        self.contador = 0
+        #self.run1()
+        
 
     def run1(self):
         pg.mixer.init()
@@ -92,6 +89,10 @@ class Game:
     def run4(self):
         pg.mixer.init()
         pg.mixer.music.load('resources/sounds/play.mp3')
+        pg.mixer.music.play()
+    def run5(self):
+        pg.mixer.init()
+        pg.mixer.music.load('resources/sounds/explosion.mp3')
         pg.mixer.music.play()
 
     def nuevoMeteor(self,dt):
@@ -116,13 +117,12 @@ class Game:
                 if event.key == K_ESCAPE:
                         pg.quit()
                         sys.exit()
+           
+                if event.key == K_UP:
+                    self.ship.go_up()
 
-            if event.type == KEYDOWN:
-                    if event.key == K_UP:
-                        self.ship.go_up()
-
-                    if event.key == K_DOWN:
-                        self.ship.go_down()
+                if event.key == K_DOWN:
+                    self.ship.go_down()
        
         keys_pressed = pg.key.get_pressed()
         if keys_pressed[K_UP]:
@@ -153,19 +153,19 @@ class Game:
                             #self.run3()
                             self.rules_screen()
                             return
-                if event.type == KEYDOWN:
+               
                         if event.key == K_SPACE:                                    
-                            self.run4()        
+                            #self.run4()        
                             self.mainloop()
                             
                             return
-                if event.type == KEYDOWN:
+                
                         if event.key == K_s:
                             #self.run3()
                             self.Story_screen()
                             return
 
-                if event.type == KEYDOWN:
+                
                         if event.key == K_ESCAPE:
                             pg.quit()
                             sys.exit()
@@ -191,7 +191,7 @@ class Game:
                             #self.run2() 
                             self.start_screen()
                             return
-                if event.type == KEYDOWN:
+                
                         if event.key == K_ESCAPE:
                             pg.quit()
                             sys.exit()
@@ -208,7 +208,7 @@ class Game:
                             #self.run2()
                             self.start_screen()
                             return
-                if event.type == KEYDOWN:
+                
                         if event.key == K_ESCAPE:
                             pg.quit()
                             sys.exit()
@@ -230,24 +230,40 @@ class Game:
                             if event.key == K_ESCAPE:
                                 pg.quit()
                                 sys.exit()
+   
     def mainloop(self):
         while True:
             dt = self.clock.tick(FPS)
             
             self.handleEvents()
-            self.livescounter = self.font.render(str(self.ship.lives), True, WHITE)
-                      
-            if self.ship.lives > 0 :
-                self.ship.test_collide(self.asteroid_group)
-                
-                if len(self.ship.candidatos) > 0:
-                    self.contador +=1
-                    self.ship.candidatos = 0
-                    self.ship.lives -= 1
-                self.contador = 0   
-                     
-            print(self.ship.lives)
+          
+            self.livescounter = self.font.render(str(self.vidas), True, WHITE)
+            
+            if self.vidas > 0:
+                self.colision = pg.sprite.groupcollide(self.player_group, self.asteroid_group, True, False) 
+                for hit in self.colision:
+                    expl = Explosion(hit.rect.center)
+                    self.run5()
+                    self.all_group.add(expl)   
+                    self.ship = Nave(10, 300)
+                    self.player_group.add(self.ship)
+                    self.all_group.add(self.player_group)    
+                    self.contador += 1
+                if self.contador > 0:              
+                    self.vidas -= 1
+            self.contador = 0
 
+            if self.vidas == 1:
+                self.colision = pg.sprite.groupcollide(self.player_group, self.asteroid_group, True, False)
+                for hit in self.colision:
+                    expl = Explosion(hit.rect.center)
+                    self.run5()
+                    self.all_group.add(expl)   
+                    self.contador += 1
+                if self.contador > 0:              
+                    self.vidas -= 1
+
+            print(self.vidas)
             self.screen.blit(self.background_img,(0,0))           
                    
             self.all_group.update(dt)
@@ -261,11 +277,10 @@ class Game:
             self.asteroid_group.draw(self.screen)           
             self.screen.blit(self.livescounter, (50, 10))
             self.screen.blit(self.marcador, (685, 10))
-            
-            if self.ship.lives == 0:
-                self.ship.kill()
+
+            if self.vidas == 0:
                 self.gameOver()
-                      
+
             pg.display.flip()
         self.quitGame()
 

@@ -4,7 +4,7 @@ from pygame.locals import *
 FPS: 60
 class Explosion(pg.sprite.Sprite):
     
-    def __init__(self, x=0,y=0):
+    def __init__(self, center):
 
         self.w = 64
         self.h = 64
@@ -13,12 +13,12 @@ class Explosion(pg.sprite.Sprite):
 
         self.image = pg.Surface((self.w, self.h), pg.SRCALPHA,32)
         self.rect = self.image.get_rect()
-        
+        self.rect.center = center
 
         self.frames = []
         self.index = 0
         self.how_many = 0
-        self.animation_time = 30
+        self.animation_time = 0
 
         self.loadFrames()
         self.current_time = 0
@@ -48,5 +48,13 @@ class Explosion(pg.sprite.Sprite):
 
             if self.index >= self.how_many:
                 self.index = 0
+                self.kill()
+                
             
             self.image = self.frames[self.index]
+            del self
+        else:
+            center = self.rect.center
+            self.image = self.frames[0]
+            self.rect = self.image.get_rect()
+            self.rect.center = center
