@@ -168,7 +168,7 @@ class Game:
             self.screen.blit(self.text_insert_coin,((800 - rect.w)//2,330)) 
             self.screen.blit(self.text_instructions,(50,560))
             self.screen.blit(self.text_story,(500,560))
-            self.ship.lives = 5
+            self.ship.lives = 1
             
             pg.display.update()
             for event in pg.event.get():
@@ -268,6 +268,7 @@ class Game:
                                 self.all_group.add(self.ship)
                                 self.asteroid_group.empty()
                                 self.puntuacion = 0
+                                self.meteorito.kill()
                                 #self.run1() 
                                 self.start_screen()
                                 return
