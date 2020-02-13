@@ -5,6 +5,7 @@ from random import randint
 candidatos = 0
 class Meteor(pg.sprite.Sprite):
     picture = ["G17.png" ,"F17.png","E16.png","D15.png" ,"C5.png","B13.png","A3.png"]
+    picture1 = ["meteoro1.png" ,"meteoro2.png","meteoro3.png"]
     
     speed = randint(1,6)
     
