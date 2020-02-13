@@ -25,9 +25,9 @@ class Explosion(pg.sprite.Sprite):
 
     def loadFrames(self):
         sprite_sheet = pg.image.load('resources/explosions/exp3.png').convert_alpha()
-        for fila in range(4):
+        for fila in range(5):
             y = fila * self.h
-            for columna in range(4):
+            for columna in range(7):
                 x = columna * self.w
 
                 image = pg.Surface((self.w, self.h), pg.SRCALPHA).convert_alpha()

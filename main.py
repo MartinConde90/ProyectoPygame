@@ -73,8 +73,10 @@ class Game:
         self.ship = Nave(10, 300)
         self.player_group.add(self.ship)
         self.ship.lives = 2
+
         self.contador = 0   
         self.puntuacion = 0
+
         self.all_group.add(self.ship, self.asteroid_group)
         self.default_font = pg.font.Font(None, 28)
 
@@ -82,18 +84,17 @@ class Game:
         self.meteor_creados = 0
         self.ultimo_meteor = FPS * 12
         self.nuevo_meteor = FPS// 4
+        #self.run8()
+        #self.run7()
         #self.run6()
         #self.run5()
         #self.run4()
         #self.run3()
         #self.run2()
-        #self.run1()
+        self.run1()
 
         self.time = pg.time.get_ticks()/1000
         
-        
-        
-
     def run1(self):
         pg.mixer.init()
         pg.mixer.music.load('resources/sounds/menu.mp3')
@@ -118,12 +119,20 @@ class Game:
         pg.mixer.init()
         pg.mixer.music.load('resources/sounds/story.mp3')
         pg.mixer.music.play()
+    def run7(self):
+        pg.mixer.init()
+        pg.mixer.music.load('resources/sounds/controls.ogg')
+        pg.mixer.music.play()
+    def run8(self):
+        pg.mixer.init()
+        pg.mixer.music.load('resources/sounds/gameover.mp3')
+        pg.mixer.music.play()
 
     def nuevoMeteor(self,dt):
         self.ultimo_meteor += dt
         if self.ultimo_meteor >= self.nuevo_meteor:
             nuevo = Meteor( x=randint(800,1000), y=randint(10, 550))
-            nuevo.speed = randint(1,6)
+            nuevo.speed = randint(1,4)
         self.asteroid_group.add(nuevo)
         self.ultimo_meteor = 0
 
@@ -168,26 +177,27 @@ class Game:
             self.screen.blit(self.text_insert_coin,((800 - rect.w)//2,330)) 
             self.screen.blit(self.text_instructions,(50,560))
             self.screen.blit(self.text_story,(500,560))
-            self.ship.lives = 1
+            self.ship.lives = 5
             
             pg.display.update()
             for event in pg.event.get():
 
                 if event.type == KEYDOWN:
                         if event.key == K_i:
-                            self.run3()
+                            #self.run3()
+                            self.run7()
                             self.rules_screen()
                             return
                
                         if event.key == K_SPACE:                                    
-                            #self.run4()        
+                            self.run4()        
                             self.mainloop()
                             
                             return
                 
                         if event.key == K_s:
                             #self.run3()
-                            #self.run6()
+                            self.run6()
                             self.Story_screen()
                             return
 
@@ -215,7 +225,7 @@ class Game:
                 if event.type == KEYDOWN:
                         if event.key == K_SPACE:
                             #self.run2() 
-                            #self.run1()
+                            self.run1()
                             self.start_screen()
                             return
                 
@@ -244,7 +254,7 @@ class Game:
                 if event.type == KEYDOWN:
                         if event.key == K_SPACE:
                             #self.run2()
-                            #self.run1()
+                            self.run1()
                             self.start_screen()
                             return
                 
@@ -253,49 +263,65 @@ class Game:
                             sys.exit()
     
     def gameOver(self):
+       
         while True:
+            dt = self.clock.tick(FPS)
+            self.screen.blit(self.background_img,(0,0))
+             
+            
+
+            self.all_group.update(dt)
+            self.all_group.draw(self.screen)     
+
+            self.asteroid_group.update(dt)
+            self.asteroid_group.draw(self.screen)
+
+            self.screen.blit(self.livescounter, (50, 10))
+            self.screen.blit(self.marcador, (660, 10))
+
             rect = self.text_gameOver.get_rect()
             self.screen.blit(self.text_gameOver, ((800 - rect.w)//2, 200))
             rect = self.text_insert_coin.get_rect()
             self.screen.blit(self.text_insert_coin, ((800 - rect.w)//2, 560))
-                  
+
+            pg.display.flip()
+
             pg.display.update()       
             for event in pg.event.get():
                     if event.type == KEYDOWN:
                             if event.key == K_SPACE:
+                                self.all_group.empty()
                                 self.ship = Nave(10, 300)
                                 self.player_group.add(self.ship)
                                 self.all_group.add(self.ship)
                                 self.asteroid_group.empty()
                                 self.puntuacion = 0
                                 self.meteorito.kill()
-                                #self.run1() 
+                                self.run1() 
                                 self.start_screen()
                                 return
                     if event.type == KEYDOWN:
                             if event.key == K_ESCAPE:
                                 pg.quit()
                                 sys.exit()
+                                
    
     def mainloop(self):
         while True:
 
             dt = self.clock.tick(FPS)
             self.time = pg.time.get_ticks()//1000
+
             self.handleEvents()
-        
-            
+                  
             if len(self.asteroid_group) == 14:
                 self.puntuacion += 5
-
-            self.livescounter = self.fontP.render(str(self.ship.lives), True, WHITE)
-            self.marcador = self.fontP.render(str(self.puntuacion), True, WHITE)
-            
+         
             if self.ship.lives > 1:
                 self.colision = pg.sprite.groupcollide(self.asteroid_group, self.player_group, True, False  ) 
                 for hit in self.colision:
                     expl = Explosion(hit.rect.center)
-                    #self.run5()
+                    self.run5()
                     self.all_group.add(expl)   
                         
                     self.contador += 1
@@ -307,13 +333,14 @@ class Game:
                 self.colision = pg.sprite.groupcollide(self.player_group, self.asteroid_group, True, False)
                 for hit in self.colision:
                     expl = Explosion(hit.rect.center)
-                    #self.run5()
+                    self.run5()
                     self.all_group.add(expl)   
                     self.contador += 1
                 if self.contador > 0:              
                     self.ship.lives -= 1
+            self.contador = 0
 
-            print(len(self.asteroid_group))
+           
             self.screen.blit(self.background_img,(0,0))           
                 
             self.all_group.update(dt)
@@ -326,7 +353,13 @@ class Game:
             if self.puntuacion == 500:
                 rect = self.text_win.get_rect()
                 self.screen.blit(self.text_win, ((800 - rect.w)//2, 200))
-                
+
+
+            self.screen.blit(self.background_img,(0,0))           
+            self.livescounter = self.fontP.render(str(self.ship.lives), True, WHITE)
+            self.marcador = self.fontP.render(str(self.puntuacion), True, WHITE)
+            self.all_group.update(dt)
+            self.all_group.draw(self.screen)     
 
             self.asteroid_group.update(dt)
             self.asteroid_group.draw(self.screen)           
@@ -334,7 +367,8 @@ class Game:
             self.screen.blit(self.marcador, (660, 10))
 
             if self.ship.lives == 0:
-                
+                self.run8()
+                expl.kill()
                 self.gameOver()
 
             pg.display.flip()
