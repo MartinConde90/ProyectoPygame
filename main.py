@@ -21,6 +21,7 @@ class Game:
         self.screen = pg.display.set_mode((800, 600))
         pg.display.set_caption('The Quest')
 
+        self.background_image = pg.image.load('resources/fondo/nebula2.jpg').convert()
         self.background_img = pg.image.load('resources/fondo/espacio1.jpg').convert()
         self.background_story = pg.image.load('resources/fondo/Reference2.jpg').convert()
         self.background_menu = pg.image.load('resources/fondo/unnamed.jpg').convert()
@@ -33,11 +34,14 @@ class Game:
         self.font = pg.font.Font('resources/fonts/PressStart.ttf', 90) 
         self.fontC = pg.font.Font('resources/fonts/PressStart.ttf', 30)
         self.fontR = pg.font.Font('resources/fonts/text.ttf', 30)
-        self.fontP = pg.font.Font('resources/fonts/PressStart.ttf', 50)
+        self.fontP = pg.font.Font('resources/fonts/PressStart.ttf', 30)
         self.fontG = pg.font.Font('resources/fonts/gameover.ttf',85)
+        self.fontL = pg.font.Font('resources/fonts/text.ttf', 50)
 
         #self.marcador = self.fontP.render('0', True, WHITE) 
-        #self.livescounter = self.fontP.render('5', True, WHITE)       
+        #self.livescounter = self.fontP.render('5', True, WHITE) 
+
+        self.text_level = self.fontL.render(" + 150 XP" ,True, FUCSIA) 
         self.text_insert_coin = self.fontC.render("Press   Spacebar", True, FUCSIA)     
         self.text_gameOver = self.fontGran.render("GAME OVER", True, RED)       
         self.text_titulo = self.font.render("THE QUEST", True, GREEN)
@@ -67,8 +71,7 @@ class Game:
         self.asteroid_group = pg.sprite.Group()      
         self.all_group = pg.sprite.Group()
 
-        self.meteorito = Meteor()
-        self.asteroid_group.add(self.meteorito)
+        
     
         self.ship = Nave(10, 300)
         self.player_group.add(self.ship)
@@ -80,7 +83,7 @@ class Game:
         self.all_group.add(self.ship, self.asteroid_group)
         self.default_font = pg.font.Font(None, 28)
 
-        self.meteor_max = 15
+        self.meteor_max = 0
         self.meteor_creados = 0
         self.ultimo_meteor = FPS * 12
         self.nuevo_meteor = FPS// 4
@@ -92,8 +95,8 @@ class Game:
         #self.run3()
         #self.run2()
         self.run1()
-
-        self.time = pg.time.get_ticks()/1000
+        self.expl= []
+        
         
     def run1(self):
         pg.mixer.init()
@@ -133,6 +136,15 @@ class Game:
         if self.ultimo_meteor >= self.nuevo_meteor:
             nuevo = Meteor( x=randint(800,1000), y=randint(10, 550))
             nuevo.speed = randint(1,4)
+        self.asteroid_group.add(nuevo)
+        self.ultimo_meteor = 0
+
+    def nuevoMeteor2(self,dt):
+        self.meteor_max = 20
+        self.ultimo_meteor += dt
+        if self.ultimo_meteor >= self.nuevo_meteor:
+            nuevo = Meteor( x=randint(800,1000), y=randint(10, 550))
+            nuevo.speed = randint(4,6)
         self.asteroid_group.add(nuevo)
         self.ultimo_meteor = 0
 
@@ -262,21 +274,22 @@ class Game:
                             pg.quit()
                             sys.exit()
     
-    def gameOver(self):
-       
+    def gameOver(self):  
         while True:
             dt = self.clock.tick(FPS)
-            self.screen.blit(self.background_img,(0,0))
-             
+            if self.puntuacion <= 200:
+                self.screen.blit(self.background_img,(0,0))
             
-
+            if self.puntuacion > 200:
+                self.screen.blit(self.background_image,(0,0))
+             
             self.all_group.update(dt)
             self.all_group.draw(self.screen)     
 
             self.asteroid_group.update(dt)
             self.asteroid_group.draw(self.screen)
 
-            self.screen.blit(self.livescounter, (50, 10))
+            self.screen.blit(self.livescounter, (100, 10))
             self.screen.blit(self.marcador, (660, 10))
 
             rect = self.text_gameOver.get_rect()
@@ -295,8 +308,7 @@ class Game:
                                 self.player_group.add(self.ship)
                                 self.all_group.add(self.ship)
                                 self.asteroid_group.empty()
-                                self.puntuacion = 0
-                                self.meteorito.kill()
+                                self.puntuacion = 0                                
                                 self.run1() 
                                 self.start_screen()
                                 return
@@ -304,56 +316,152 @@ class Game:
                             if event.key == K_ESCAPE:
                                 pg.quit()
                                 sys.exit()
-                                
-   
-    def mainloop(self):
+
+    def level_complete(self):
         while True:
-
             dt = self.clock.tick(FPS)
-            self.time = pg.time.get_ticks()//1000
+            
+            self.marcador = self.fontP.render(str(self.puntuacion), True, WHITE)
+            
 
+            if self.puntuacion == 200:
+                self.screen.blit(self.background_img,(0,0))
+
+            if self.puntuacion == 450:
+                self.screen.blit(self.background_image,(0,0))
+
+            self.livescounter = self.fontP.render(str(self.ship.lives), True, WHITE)
+            self.colisiones()
+
+            self.all_group.update(dt)
+            self.all_group.draw(self.screen)     
+
+            self.asteroid_group.update(dt)
+            self.asteroid_group.draw(self.screen)
+
+            self.screen.blit(self.livescounter, (100, 10))
+            self.screen.blit(self.marcador, (660, 10))
+
+            rect = self.text_win.get_rect()
+            self.screen.blit(self.text_win, ((800 - rect.w)//2, 230))
+            rect = self.text_level.get_rect()
+            self.screen.blit(self.text_level, ((800 - rect.w)//2, 310))
+            
+            
+            pg.display.flip()
+
+            pg.display.update() 
+
+            for event in pg.event.get():
+                    if event.type == KEYDOWN:
+                            if event.key == K_SPACE:                                
+                                self.asteroid_group.empty()
+                                                            
+                                self.level_2()
+                                return
+                            if event.key == K_UP:
+                                self.ship.go_up()
+
+                            if event.key == K_DOWN:
+                                self.ship.go_down()
+       
+            keys_pressed = pg.key.get_pressed()
+            if keys_pressed[K_UP]:
+                self.ship.go_up()
+                self.ship.speed +=0.4
+            if keys_pressed[K_DOWN]:
+                self.ship.go_down()
+                self.ship.speed +=0.4
+        
+            if keys_pressed[K_UP] == False and keys_pressed[K_DOWN] == False:
+                self.ship.speed = 5
+
+    def level_2(self):
+        while True:
+            dt = self.clock.tick(FPS)
+                    
             self.handleEvents()
                   
-            if len(self.asteroid_group) == 14:
+            if len(self.asteroid_group) == 19:
                 self.puntuacion += 5
          
-            if self.ship.lives > 1:
-                self.colision = pg.sprite.groupcollide(self.asteroid_group, self.player_group, True, False  ) 
-                for hit in self.colision:
-                    expl = Explosion(hit.rect.center)
-                    self.run5()
-                    self.all_group.add(expl)   
-                        
-                    self.contador += 1
-                if self.contador > 0:              
-                    self.ship.lives -= 1
-            self.contador = 0
-
-            if self.ship.lives == 1:
-                self.colision = pg.sprite.groupcollide(self.player_group, self.asteroid_group, True, False)
-                for hit in self.colision:
-                    expl = Explosion(hit.rect.center)
-                    self.run5()
-                    self.all_group.add(expl)   
-                    self.contador += 1
-                if self.contador > 0:              
-                    self.ship.lives -= 1
-            self.contador = 0
-
-           
-            self.screen.blit(self.background_img,(0,0))           
-                
+            self.colisiones()
+            
             self.all_group.update(dt)
             self.all_group.draw(self.screen) 
 
             pintados = len(self.asteroid_group)
             if pintados < self.meteor_max:
+                self.nuevoMeteor2(dt)
+
+            self.screen.blit(self.background_image,(0,0))           
+            self.livescounter = self.fontP.render(str(self.ship.lives), True, WHITE)
+            self.marcador = self.fontP.render(str(self.puntuacion), True, WHITE)
+            self.all_group.update(dt)
+            self.all_group.draw(self.screen)     
+
+            self.asteroid_group.update(dt)
+            self.asteroid_group.draw(self.screen)           
+            self.screen.blit(self.livescounter, (100, 10))
+            self.screen.blit(self.marcador, (660, 10))
+
+            if self.puntuacion == 300:
+                self.puntuacion += 150
+                
+
+            if self.ship.lives == 0:
+                self.run8()
+                
+                self.gameOver()
+
+            pg.display.flip()
+
+            
+        self.quitGame()
+
+    def colisiones(self):
+        if self.ship.lives > 1:
+                self.colision = pg.sprite.groupcollide(self.asteroid_group, self.player_group, True, False  ) 
+                for hit in self.colision:
+                    self.expl = Explosion(hit.rect.center)
+                    self.run5()
+                    self.all_group.add(self.expl)   
+                        
+                    self.contador += 1
+                if self.contador > 0:              
+                    self.ship.lives -= 1
+        self.contador = 0
+
+        if self.ship.lives == 1:
+            self.colision = pg.sprite.groupcollide(self.player_group, self.asteroid_group, True, False)
+            for hit in self.colision:
+                self.expl = Explosion(hit.rect.center)
+                self.run5()
+                self.all_group.add(self.expl)   
+                self.contador += 1
+            if self.contador > 0:              
+                self.ship.lives -= 1
+        self.contador = 0
+
+    def mainloop(self):
+        while True:
+
+            dt = self.clock.tick(FPS)
+            tiempo =  pg.time.get_ticks()
+            print(tiempo)
+            self.handleEvents()
+            self.meteor_max = 15     
+            if len(self.asteroid_group) == 14:
+                self.puntuacion += 5
+         
+            self.colisiones()
+            
+            self.all_group.update(dt)
+            self.all_group.draw(self.screen) 
+            
+            pintados = len(self.asteroid_group)
+            if pintados < self.meteor_max:
                 self.nuevoMeteor(dt)
-
-            if self.puntuacion == 500:
-                rect = self.text_win.get_rect()
-                self.screen.blit(self.text_win, ((800 - rect.w)//2, 200))
-
 
             self.screen.blit(self.background_img,(0,0))           
             self.livescounter = self.fontP.render(str(self.ship.lives), True, WHITE)
@@ -363,20 +471,22 @@ class Game:
 
             self.asteroid_group.update(dt)
             self.asteroid_group.draw(self.screen)           
-            self.screen.blit(self.livescounter, (50, 10))
+            self.screen.blit(self.livescounter, (100, 10))
             self.screen.blit(self.marcador, (660, 10))
+
+            if self.puntuacion == 50:
+                self.puntuacion += 150
+                self.level_complete()
 
             if self.ship.lives == 0:
                 self.run8()
-                expl.kill()
+                
                 self.gameOver()
 
             pg.display.flip()
 
             
         self.quitGame()
-
-            
 
 
 if __name__ == '__main__':

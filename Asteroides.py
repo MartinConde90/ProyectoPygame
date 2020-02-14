@@ -14,9 +14,16 @@ class Meteor(pg.sprite.Sprite):
         self.y = y
     
         pg.sprite.Sprite.__init__(self)
-
-        self.image = pg.image.load('resources/meteor/{}'.format(self.picture[randint(0,3)])).convert_alpha()
-                
+        
+        self.tiempo =  pg.time.get_ticks()
+        
+        
+        self.image = pg.image.load('resources/meteor/{}'.format(self.picture1[randint(0,2)])).convert_alpha()
+        
+        if self.tiempo > 6802:
+            self.image = pg.image.load('resources/meteor/{}'.format(self.picture[randint(0,3)])).convert_alpha()
+        
+        
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
