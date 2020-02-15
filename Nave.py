@@ -35,8 +35,4 @@ class Nave(pg.sprite.Sprite):
 
     def test_collide(self, group):
         self.candidatos = pg.sprite.spritecollide(self, group, True)
-
-
-    
-    
-    
+  
