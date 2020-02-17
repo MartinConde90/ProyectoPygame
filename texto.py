@@ -18,8 +18,9 @@ class Texto():
         self.background_story = pg.image.load('resources/fondo/Reference2.jpg').convert()
         self.background_menu = pg.image.load('resources/fondo/unnamed.jpg').convert()
         self.background_rules = pg.image.load('resources/fondo/controls.jpg').convert()
-        self.UP = pg.image.load('resources/up.png').convert().convert_alpha()
-        self.DOWN = pg.image.load('resources/down.png').convert().convert_alpha()
+        self.UP = pg.image.load('resources/up.png').convert_alpha()
+        self.DOWN = pg.image.load('resources/down.png').convert_alpha()
+        self.Planet = pg.image.load('resources/planeta/PlanetRaw.png').convert_alpha()
 
 
         self.fontGran = pg.font.Font('resources/fonts/gameover.ttf', 150)

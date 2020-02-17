@@ -7,12 +7,14 @@ from Nave import *
 from Asteroides import *
 from explosion import *
 from texto import *
+from planeta import *
 FPS = 60
 
 class Juego():
     clock = pg.time.Clock()
     def __init__(self):
        
+        self.planeta_group = pg.sprite.Group()
         self.player_group = pg.sprite.Group()
         self.asteroid_group = pg.sprite.Group()      
         self.all_group = pg.sprite.Group()
@@ -21,10 +23,14 @@ class Juego():
         self.texto = Texto()
         self.ship = Nave(10, 300)
         self.player_group.add(self.ship)
-        self.ship.lives = 2
+        #self.ship.lives = 2
+
+        self.planeta = Planeta()
+        self.planeta_group.add(self.planeta)
 
         self.contador = 0   
         self.puntuacion = 0
+        self.desactivar = True
 
         self.all_group.add(self.ship, self.asteroid_group)
         self.default_font = pg.font.Font(None, 28)
@@ -356,15 +362,26 @@ class Juego():
 
             self.texto.screen.blit(self.livescounter, (100, 10))
             self.texto.screen.blit(self.marcador, (660, 10))
-            
+            if self.desactivar:
+                self.handleEvents()
             if self.ship.lives == 0:
                 self.texto.run8()
                 
                 self.gameOver()
             
             #APARICION PLANETA Y ATERRIZAJE
-            if len(self.asteroid_group) == 0:
-                self.gameOver()
+            if len(self.asteroid_group) == 0 and self.ship.lives > 0:
+                self.desactivar = False
+                
+                self.planeta_group.update(dt)
+                self.planeta_group.draw(self.texto.screen)
+                
+                if self.planeta.rect.x == 600:                
+                    self.planeta_group.empty()
+                    self.planeta.kill()
+                    self.texto.screen.blit(self.texto.Planet,(600,-50))
+                    self.aterrizaje()
+                
 
 
             pg.display.flip()
@@ -376,22 +393,43 @@ class Juego():
                             if event.key == K_ESCAPE:
                                 pg.quit()
                                 sys.exit()                           
-                            if event.key == K_UP:
-                                self.ship.go_up()
-
-                            if event.key == K_DOWN:
-                                self.ship.go_down()
-       
-            keys_pressed = pg.key.get_pressed()
-            if keys_pressed[K_UP]:
-                self.ship.go_up()
-                self.ship.speed +=0.4
-            if keys_pressed[K_DOWN]:
-                self.ship.go_down()
-                self.ship.speed +=0.4
+          
+    def aterrizaje(self):
         
-            if keys_pressed[K_UP] == False and keys_pressed[K_DOWN] == False:
-                self.ship.speed = 5
+        dt = self.clock.tick(FPS)
+
+        self.marcador = self.texto.fontP.render(str(self.puntuacion), True, WHITE)
+        self.texto.screen.blit(self.texto.background_image,(0,0))
+        self.livescounter = self.texto.fontP.render(str(self.ship.lives), True, WHITE)
+        self.texto.screen.blit(self.texto.Planet,(600,-50))
+
+        self.texto.screen.blit(self.livescounter, (100, 10))
+        self.texto.screen.blit(self.marcador, (660, 10))
+
+        self.all_group.update(dt)
+        self.all_group.draw(self.texto.screen)  
+        
+               
+        if self.ship.rect.y > 300:
+            self.ship.rect.y = self.ship.rect.y - 2
+        if self.ship.rect.y < 300:
+            self.ship.rect.y = self.ship.rect.y + 2
+        if self.ship.rect.y == 300 and self.ship.rect.x == 10:
+            self.player_group.empty()
+            self.ship.kill()
+            self.ship = Nave(10, 300)
+            self.player_group.add(self.ship)
+            self.all_group.add(self.ship)
+
+        
+        if self.ship.rect.x < 700:   
+            self.ship.rect.x = self.ship.rect.x + 4
+                    
+            
+        
+        pg.display.flip()
+
+        pg.display.update()
 
     def gameOver(self):  
         while True:
