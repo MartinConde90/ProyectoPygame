@@ -25,17 +25,20 @@ class Texto():
 
         self.fontGran = pg.font.Font('resources/fonts/gameover.ttf', 150)
         self.font = pg.font.Font('resources/fonts/PressStart.ttf', 90) 
-        self.fontC = pg.font.Font('resources/fonts/PressStart.ttf', 30)
+        self.fontC = pg.font.Font('resources/fonts/PressStart.ttf', 25)
         self.fontR = pg.font.Font('resources/fonts/text.ttf', 30)
         self.fontP = pg.font.Font('resources/fonts/PressStart.ttf', 30)
         self.fontG = pg.font.Font('resources/fonts/gameover.ttf',85)
         self.fontL = pg.font.Font('resources/fonts/text.ttf', 50)
+        self.fontRanking = pg.font.Font('resources/fonts/ranking.ttf', 100)
 
         #self.marcador = self.fontP.render('0', True, WHITE) 
         #self.livescounter = self.fontP.render('5', True, WHITE) 
 
+        self.text_rankings = self.fontRanking.render("BEST SCORES",True, FUCSIA)
         self.text_level = self.fontL.render(" + 150 XP" ,True, FUCSIA) 
-        self.text_insert_coin = self.fontC.render("Press   Spacebar", True, FUCSIA)     
+        self.text_insert_coin = self.fontC.render("Press   Spacebar", True, FUCSIA) 
+        self.text_insertCoin = self.fontR.render("-  Insert Coin  -", True, FUCSIA)    
         self.text_gameOver = self.fontGran.render("GAME OVER", True, RED)       
         self.text_titulo = self.font.render("THE QUEST", True, GREEN)
         self.text_win = self.fontG.render("Level Complete", True, GREEN) 
@@ -57,8 +60,10 @@ class Texto():
         self.text_controlesS = self.fontR.render("Manten pulsado          o          para aumentar la velocidad", True, GREEN)
         self.text_controlesE = self.fontR.render("Pulsa            para salir del juego", True, GREEN)
         self.text_return = self.fontC.render("Press   Spacebar   to   return", True, FUCSIA)
-        self.text_instructions = self.fontR.render("Press I to see instructions", True, WHITE)
-        self.text_story = self.fontR.render("Press S  to know your story", True, WHITE)
+        self.text_instructions = self.fontR.render("I to see instructions", True, WHITE)
+        self.text_story = self.fontR.render("S  to know your story", True, WHITE)
+        self.text_ranking = self.fontR.render("R to see best scores", True, WHITE)
+        
 
     def run1(self):
         pg.mixer.init()

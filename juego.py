@@ -8,8 +8,10 @@ from Asteroides import *
 from explosion import *
 from texto import *
 from planeta import *
+from ranking import *
+import sqlite3
 FPS = 60
-
+BASE_DATOS = "Ranking.db"
 class Juego():
     clock = pg.time.Clock()
     def __init__(self):
@@ -19,7 +21,12 @@ class Juego():
         self.asteroid_group = pg.sprite.Group()      
         self.all_group = pg.sprite.Group()
 
-        
+        self.query2 = "SELECT Jugador, Puntuación FROM Ranking order by Puntuación desc" #"insertamos una tareas y escribimos la consulta que queremos"
+        self.query = 'Insert into Ranking (Jugador, Puntuación) values (?, ?);' #"los interrogantes son los valores de titulo etc"        
+        self.conn = sqlite3.connect('Ranking.db')
+        self.cursor = self.conn.cursor()    
+        self.jugador = "MCG"
+
         self.texto = Texto()
         self.ship = Nave(10, 300)
         self.player_group.add(self.ship)
@@ -100,9 +107,11 @@ class Juego():
             rect = self.texto.text_titulo.get_rect()
             self.texto.screen.blit(self.texto.text_titulo,((800 - rect.w)//2,100))
             rect = self.texto.text_insert_coin.get_rect()
-            self.texto.screen.blit(self.texto.text_insert_coin,((800 - rect.w)//2,330)) 
-            self.texto.screen.blit(self.texto.text_instructions,(50,560))
-            self.texto.screen.blit(self.texto.text_story,(500,560))
+            self.texto.screen.blit(self.texto.text_insert_coin,((800 - rect.w)//2,340)) 
+            self.texto.screen.blit(self.texto.text_insertCoin,(325,370))
+            self.texto.screen.blit(self.texto.text_instructions,(20,560))
+            self.texto.screen.blit(self.texto.text_story,(560,560))
+            self.texto.screen.blit(self.texto.text_ranking,(300,560))
             self.ship.lives = 5
             
             pg.display.update()
@@ -125,6 +134,12 @@ class Juego():
                             #self.texto.run3()
                             self.texto.run6()
                             self.Story_screen()
+                            return
+                        
+                        if event.key == K_r:
+                            #self.texto.run3()
+                            self.texto.run6()
+                            self.ranking_screen()
                             return
 
                 
@@ -188,6 +203,47 @@ class Juego():
                             pg.quit()
                             sys.exit()
     
+    def ranking_screen(self):
+        while True:
+            self.texto.screen.blit(self.texto.background_story,(0,0))
+            rect = self.texto.text_return.get_rect()
+            self.texto.screen.blit(self.texto.text_return,((800 - rect.w)//2,560))
+            
+            self.texto.screen.blit(self.texto.text_rankings,(175,50))
+
+            
+            self.consulta()
+
+            pg.display.update()
+            for event in pg.event.get():
+                if event.type == KEYDOWN:
+                        if event.key == K_SPACE:
+                            #self.texto.run2()
+                            self.texto.run1()
+                            self.conn.close()
+                            self.start_screen()
+                            return
+                
+                        if event.key == K_ESCAPE:
+                            pg.quit()
+                            sys.exit()
+                        
+                        
+    
+
+    def insertar_tarea(self):    
+        self.cursor.execute(self.query,(self.jugador, self.puntuacion))
+        self.conn.commit()
+        
+        
+    def consulta(self):       
+        self.filas = self.cursor.execute(self.query2) #"en vez de query podriamos haber puesto la consulta directamente"
+        for fila in self.filas:
+            #fila es una tupla
+            fila[0] #jugador
+            fila[1] #puntuacion
+            print(fila)
+
     def level_1(self):
         while True:
 
@@ -414,16 +470,10 @@ class Juego():
             self.ship.rect.y = self.ship.rect.y - 2
         if self.ship.rect.y < 300:
             self.ship.rect.y = self.ship.rect.y + 2
-        if self.ship.rect.y == 300 and self.ship.rect.x == 10:
-            self.player_group.empty()
-            self.ship.kill()
-            self.ship = Nave(10, 300)
-            self.player_group.add(self.ship)
-            self.all_group.add(self.ship)
+        if self.ship.rect.x < 550:   
+            self.ship.rect.x = self.ship.rect.x + 4
 
         
-        if self.ship.rect.x < 700:   
-            self.ship.rect.x = self.ship.rect.x + 4
                     
             
         
@@ -473,6 +523,8 @@ class Juego():
                             if event.key == K_ESCAPE:
                                 pg.quit()
                                 sys.exit()
+                            if event.key == K_m:
+                                self.insertar_tarea()
 
     def colisiones(self):
         if self.ship.lives > 1:
