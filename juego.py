@@ -60,17 +60,17 @@ class Juego():
     def nuevoMeteor(self,dt):
         self.ultimo_meteor += dt
         if self.ultimo_meteor >= self.nuevo_meteor:
-            nuevo = Meteor( x=randint(800,1000), y=randint(10, 550))
+            nuevo = Meteor( False, x=randint(800,1000), y=randint(10, 550))
             nuevo.speed = randint(1,4)
         self.asteroid_group.add(nuevo)
         self.ultimo_meteor = 0
 
     def nuevoMeteor2(self,dt):
-        self.meteor.enemigo = True
+        
         self.meteor_max = 20
         self.ultimo_meteor += dt
         if self.ultimo_meteor >= self.nuevo_meteor:
-            nuevo = Meteor( x=randint(800,1000), y=randint(10, 550))
+            nuevo = Meteor( True, x=randint(800,1000), y=randint(10, 550))
             nuevo.speed = randint(4,6)
         self.asteroid_group.add(nuevo)
         self.ultimo_meteor = 0
@@ -482,10 +482,10 @@ class Juego():
         if self.ship.rect.y < 300:
             self.ship.rect.y = self.ship.rect.y + 2
         
-        if self.ship.rect.x < 500:   
+        if self.ship.rect.x < 600:   
             self.ship.rect.x = self.ship.rect.x + 4
         
-        if self.ship.rect.x > 500 and self.ship.rect.x < 700:   
+        if self.ship.rect.x >= 600 and self.ship.rect.x < 700:   
             self.ship.rect.x = self.ship.rect.x + 1
 
         if self.ship.rect.x == 700: 
@@ -493,33 +493,21 @@ class Juego():
             self.ship.kill()  
             
         if len(self.player_group) == 0:    
-            self.surf = pg.image.load("resources/nave/nave.png").convert_alpha()
             
-            self.rect = self.surf.get_rect(x=700, y=300)
             
             if self.current_angle <= 180:    
                 self.current_angle += 4
 
                         
-            self.texto.screen.blit(self.rot_center(self.surf, self.current_angle), self.rect)
+            self.texto.screen.blit(self.ship.rot_center(self.ship.surf, self.current_angle), self.ship.rect1)
             print(self.current_angle)
 
         if self.current_angle >= 180:
-            self.gameOver()
+            pass
         
         pg.display.flip()
 
         pg.display.update()
-
-
-
-    def rot_center(self,image, angle):
-        orig_rect = image.get_rect()
-        rot_image = pg.transform.rotate(image, angle)
-        rot_rect = orig_rect.copy()
-        rot_rect.center = rot_image.get_rect().center
-        rot_image = rot_image.subsurface(rot_rect).copy()
-        return rot_image
 
     def gameOver(self):  
         while True:

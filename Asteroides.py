@@ -11,7 +11,7 @@ class Meteor(pg.sprite.Sprite):
     
     speed = randint(1,4)
     
-    def __init__(self, x=randint(800,1000), y=randint(10, 550)):
+    def __init__(self, cambio = False, x=randint(800,1000), y=randint(10, 550)):
         self.x = x
         self.y = y
     
@@ -21,7 +21,7 @@ class Meteor(pg.sprite.Sprite):
         
         self.image = pg.image.load('resources/meteor/{}'.format(self.picture[randint(0,2)])).convert_alpha()
         
-        self.enemigo = False
+        self.enemigo = cambio
 
         if self.enemigo:
             self.image = pg.image.load('resources/meteor/{}'.format(self.picture1[randint(0,3)])).convert_alpha()
