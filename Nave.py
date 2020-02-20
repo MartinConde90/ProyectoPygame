@@ -22,7 +22,18 @@ class Nave(pg.sprite.Sprite):
         self.rect.y = y
         self.w = self.rect.w
         self.h = self.rect.h
-       
+
+        self.surf = self.image
+        self.rect1 = self.surf.get_rect(x=700, y=300)
+
+    def rot_center(self,image, angle):
+        orig_rect = image.get_rect()
+        rot_image = pg.transform.rotate(image, angle)
+        rot_rect = orig_rect.copy()
+        rot_rect.center = rot_image.get_rect().center
+        rot_image = rot_image.subsurface(rot_rect).copy()
+        return rot_image
+
     def go_up(self):
         self.rect.y = max(0, self.rect.y - self.speed)  
         if self.y <= 0:

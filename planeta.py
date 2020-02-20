@@ -5,7 +5,7 @@ FPS = 60
 
 class Planeta(pg.sprite.Sprite):
     pictures = 'PlanetRaw.png'
-    speed = 2
+    speed = 1
     
 
     def __init__(self, x=800, y=-50):
