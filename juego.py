@@ -10,6 +10,7 @@ from texto import *
 from planeta import *
 from ranking import *
 import sqlite3
+
 FPS = 60
 BASE_DATOS = "Ranking.db"
 class Juego():
@@ -21,13 +22,16 @@ class Juego():
         self.asteroid_group = pg.sprite.Group()      
         self.all_group = pg.sprite.Group()
 
-        self.query2 = "SELECT Jugador, Puntuación FROM Ranking order by Puntuación desc" #"insertamos una tareas y escribimos la consulta que queremos"
-        self.query = 'Insert into Ranking (Jugador, Puntuación) values (?, ?);' #"los interrogantes son los valores de titulo etc"        
+        self.query2 = "SELECT Jugador, Puntuacion FROM Ranking order by Puntuacion desc" #"insertamos una tareas y escribimos la consulta que queremos"
+        self.query = 'Insert into Ranking (Jugador, Puntuacion) values (?, ?);' #"los interrogantes son los valores de titulo etc"        
         self.conn = sqlite3.connect('Ranking.db')
         self.cursor = self.conn.cursor()    
         self.jugador = "MCG"
 
+        
+
         self.texto = Texto()
+        self.meteor = Meteor()
         self.ship = Nave(10, 300)
         self.player_group.add(self.ship)
         #self.ship.lives = 2
@@ -40,17 +44,18 @@ class Juego():
         self.desactivar = True
 
         self.all_group.add(self.ship, self.asteroid_group)
-        self.default_font = pg.font.Font(None, 28)
+        
 
         self.meteor_max = 0
         self.meteor_creados = 0
         self.ultimo_meteor = FPS * 12
         self.nuevo_meteor = FPS// 4
-        
+        self.crear_tabla()
         self.expl= []
-
+        self.current_angle = 0
         self.aux = 1
-        self.texto.run1()
+        #self.texto.run1()
+        
         
     def nuevoMeteor(self,dt):
         self.ultimo_meteor += dt
@@ -61,6 +66,7 @@ class Juego():
         self.ultimo_meteor = 0
 
     def nuevoMeteor2(self,dt):
+        self.meteor.enemigo = True
         self.meteor_max = 20
         self.ultimo_meteor += dt
         if self.ultimo_meteor >= self.nuevo_meteor:
@@ -125,7 +131,9 @@ class Juego():
                             return
                
                         if event.key == K_SPACE:                                    
-                            self.texto.run4()        
+                            #self.texto.run4()  
+                            self.current_angle = 0 
+                            self.desactivar = True     
                             self.level_1()
                             
                             return
@@ -227,15 +235,18 @@ class Juego():
                         if event.key == K_ESCAPE:
                             pg.quit()
                             sys.exit()
-                        
-                        
-    
+                                          
+    def crear_tabla(self):
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS `ranking` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `Jugador` TEXT NOT NULL, `Puntuacion` INTEGER NOT NULL)")
 
-    def insertar_tarea(self):    
-        self.cursor.execute(self.query,(self.jugador, self.puntuacion))
-        self.conn.commit()
-        
-        
+    def insertar_tarea(self):  
+        try:  
+            self.cursor.execute(self.query,(self.jugador, self.puntuacion))
+            self.conn.commit()
+        except sqlite3.Error as e:
+            print("Error", e , "en la insercion")
+            self.conn.close()
+   
     def consulta(self):       
         self.filas = self.cursor.execute(self.query2) #"en vez de query podriamos haber puesto la consulta directamente"
         for fila in self.filas:
@@ -470,16 +481,45 @@ class Juego():
             self.ship.rect.y = self.ship.rect.y - 2
         if self.ship.rect.y < 300:
             self.ship.rect.y = self.ship.rect.y + 2
-        if self.ship.rect.x < 550:   
-            self.ship.rect.x = self.ship.rect.x + 4
-
         
-                    
+        if self.ship.rect.x < 500:   
+            self.ship.rect.x = self.ship.rect.x + 4
+        
+        if self.ship.rect.x > 500 and self.ship.rect.x < 700:   
+            self.ship.rect.x = self.ship.rect.x + 1
+
+        if self.ship.rect.x == 700: 
+            self.player_group.empty()
+            self.ship.kill()  
             
+        if len(self.player_group) == 0:    
+            self.surf = pg.image.load("resources/nave/nave.png").convert_alpha()
+            
+            self.rect = self.surf.get_rect(x=700, y=300)
+            
+            if self.current_angle <= 180:    
+                self.current_angle += 4
+
+                        
+            self.texto.screen.blit(self.rot_center(self.surf, self.current_angle), self.rect)
+            print(self.current_angle)
+
+        if self.current_angle >= 180:
+            self.gameOver()
         
         pg.display.flip()
 
         pg.display.update()
+
+
+
+    def rot_center(self,image, angle):
+        orig_rect = image.get_rect()
+        rot_image = pg.transform.rotate(image, angle)
+        rot_rect = orig_rect.copy()
+        rot_rect.center = rot_image.get_rect().center
+        rot_image = rot_image.subsurface(rot_rect).copy()
+        return rot_image
 
     def gameOver(self):  
         while True:
@@ -525,7 +565,7 @@ class Juego():
                                 sys.exit()
                             if event.key == K_m:
                                 self.insertar_tarea()
-
+                                
     def colisiones(self):
         if self.ship.lives > 1:
                 self.colision = pg.sprite.groupcollide(self.asteroid_group, self.player_group, True, False  ) 
