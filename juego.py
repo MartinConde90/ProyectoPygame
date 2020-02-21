@@ -22,11 +22,14 @@ class Juego():
         self.asteroid_group = pg.sprite.Group()      
         self.all_group = pg.sprite.Group()
 
-        self.query2 = "SELECT Jugador, Puntuacion FROM Ranking order by Puntuacion desc" #"insertamos una tareas y escribimos la consulta que queremos"
-        self.query = 'Insert into Ranking (Jugador, Puntuacion) values (?, ?);' #"los interrogantes son los valores de titulo etc"        
+        self.query2 = "SELECT Jugador, Puntuación FROM Ranking order by Puntuación desc limit 0,5" #"insertamos una tareas y escribimos la consulta que queremos"
+        self.query = 'Insert into Ranking (Jugador, Puntuación) values (?, ?);' #"los interrogantes son los valores de titulo etc"        
         self.conn = sqlite3.connect('Ranking.db')
         self.cursor = self.conn.cursor()    
         self.jugador = "MCG"
+
+        self.scores = []
+        self.mostrar_lista = []
 
         
 
@@ -219,9 +222,46 @@ class Juego():
             
             self.texto.screen.blit(self.texto.text_rankings,(175,50))
 
-            
-            self.consulta()
+            self.lista_ranking()
 
+            if len(self.mostrar_lista) > 0:
+                print(self.mostrar_lista)
+               
+                primera = self.mostrar_lista[0]
+                self.text_rank = self.texto.fontRank.render(primera[0] ,True, NARANJA)
+                self.texto.screen.blit(self.text_rank,((800 - rect.w)//2+100,200))
+                self.text_rank = self.texto.fontRank.render(str(primera[1]) ,True, NARANJA)
+                self.texto.screen.blit(self.text_rank,((800 - rect.w)*2-100,200))
+
+                if len(self.mostrar_lista) > 1:
+                    segunda = self.mostrar_lista[1]
+                    self.text_rank = self.texto.fontRank.render(segunda[0] ,True, NARANJA)
+                    self.texto.screen.blit(self.text_rank,((800 - rect.w)//2+100,250))
+                    self.text_rank = self.texto.fontRank.render(str(segunda[1]) ,True, NARANJA)
+                    self.texto.screen.blit(self.text_rank,((800 - rect.w)*2-100,250))
+                    
+                    if len(self.mostrar_lista) > 2:
+                        tercera= self.mostrar_lista[2]
+                        self.text_rank = self.texto.fontRank.render(tercera[0] ,True, NARANJA)
+                        self.texto.screen.blit(self.text_rank,((800 - rect.w)//2+100,300))
+                        self.text_rank = self.texto.fontRank.render(str(tercera[1]) ,True, NARANJA)
+                        self.texto.screen.blit(self.text_rank,((800 - rect.w)*2-100,300))
+
+                        if len(self.mostrar_lista) > 3:
+                            cuarta = self.mostrar_lista[3]
+                            self.text_rank = self.texto.fontRank.render(cuarta[0] ,True, NARANJA)
+                            self.texto.screen.blit(self.text_rank,((800 - rect.w)//2+100,350))
+                            self.text_rank = self.texto.fontRank.render(str(cuarta[1]) ,True, NARANJA)
+                            self.texto.screen.blit(self.text_rank,((800 - rect.w)*2-100,350))
+
+                            if len(self.mostrar_lista) > 4:
+                                quinta = self.mostrar_lista[4]
+                                self.text_rank = self.texto.fontRank.render(quinta[0] ,True, NARANJA)
+                                self.texto.screen.blit(self.text_rank,((800 - rect.w)//2+100,400))
+                                self.text_rank = self.texto.fontRank.render(str(quinta[1]) ,True, NARANJA)
+                                self.texto.screen.blit(self.text_rank,((800 - rect.w)*2-100,400))
+            self.mostrar_lista = []
+            
             pg.display.update()
             for event in pg.event.get():
                 if event.type == KEYDOWN:
@@ -237,9 +277,10 @@ class Juego():
                             sys.exit()
                                           
     def crear_tabla(self):
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS `ranking` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `Jugador` TEXT NOT NULL, `Puntuacion` INTEGER NOT NULL)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS `ranking` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `Jugador` TEXT NOT NULL, `Puntuación` INTEGER NOT NULL)")
 
-    def insertar_tarea(self):  
+    def insertar_score(self):  
+        
         try:  
             self.cursor.execute(self.query,(self.jugador, self.puntuacion))
             self.conn.commit()
@@ -248,12 +289,26 @@ class Juego():
             self.conn.close()
    
     def consulta(self):       
-        self.filas = self.cursor.execute(self.query2) #"en vez de query podriamos haber puesto la consulta directamente"
-        for fila in self.filas:
-            #fila es una tupla
-            fila[0] #jugador
-            fila[1] #puntuacion
-            print(fila)
+        filas = self.cursor.execute(self.query2) #"en vez de query podriamos haber puesto la consulta directamente"
+        
+        for fila in filas:
+            self.scores.append(fila)
+        if len(self.scores) > 0:     
+            if len(self.scores) >= 5:  
+                quinto = self.scores[4]
+                if quinto[1] < self.puntuacion:
+                    self.insertar_score()   
+                
+            else:
+                self.insertar_score()
+        else:
+            self.insertar_score()
+        self.scores = []
+                    
+    def lista_ranking(self):
+        filas = self.cursor.execute(self.query2)
+        for lista in filas:
+            self.mostrar_lista.append(lista)
 
     def level_1(self):
         while True:
@@ -531,19 +586,21 @@ class Juego():
             self.texto.screen.blit(self.texto.text_gameOver, ((800 - rect.w)//2, 200))
             rect = self.texto.text_insert_coin.get_rect()
             self.texto.screen.blit(self.texto.text_insert_coin, ((800 - rect.w)//2, 560))
-
+            
             pg.display.flip()
 
             pg.display.update()       
             for event in pg.event.get():
                     if event.type == KEYDOWN:
                             if event.key == K_SPACE:
+                                self.consulta()
                                 self.all_group.empty()
                                 self.ship = Nave(10, 300)
                                 self.player_group.add(self.ship)
                                 self.all_group.add(self.ship)
                                 self.asteroid_group.empty()
-                                self.puntuacion = 0                                
+                                self.puntuacion = 0  
+                                                              
                                 self.texto.run1() 
                                 self.start_screen()
                                 return
@@ -551,9 +608,7 @@ class Juego():
                             if event.key == K_ESCAPE:
                                 pg.quit()
                                 sys.exit()
-                            if event.key == K_m:
-                                self.insertar_tarea()
-                                
+                                                              
     def colisiones(self):
         if self.ship.lives > 1:
                 self.colision = pg.sprite.groupcollide(self.asteroid_group, self.player_group, True, False  ) 

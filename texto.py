@@ -31,10 +31,11 @@ class Texto():
         self.fontG = pg.font.Font('resources/fonts/gameover.ttf',85)
         self.fontL = pg.font.Font('resources/fonts/text.ttf', 50)
         self.fontRanking = pg.font.Font('resources/fonts/ranking.ttf', 100)
+        self.fontRank = pg.font.Font('resources/fonts/ranking.ttf', 40)
 
         #self.marcador = self.fontP.render('0', True, WHITE) 
         #self.livescounter = self.fontP.render('5', True, WHITE) 
-
+        #self.text_rank = self.fontRank.render("BEST SCORES",True, FUCSIA)
         self.text_rankings = self.fontRanking.render("BEST SCORES",True, FUCSIA)
         self.text_level = self.fontL.render(" + 150 XP" ,True, FUCSIA) 
         self.text_insert_coin = self.fontC.render("Press   Spacebar", True, FUCSIA) 
