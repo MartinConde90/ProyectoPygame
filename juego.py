@@ -121,7 +121,7 @@ class Juego():
             self.texto.screen.blit(self.texto.text_instructions,(20,560))
             self.texto.screen.blit(self.texto.text_story,(560,560))
             
-            self.ship.lives = 5
+            self.ship.lives = 10
             
             pg.display.update()
             for event in pg.event.get():
@@ -217,9 +217,28 @@ class Juego():
         while True:
             self.reiniciar += 0.2
             print(self.reiniciar)
+            dt = self.clock.tick(FPS)
             
+            if self.ship.lives== 0:
+                
+                if self.puntuacion <= 450:
+                    self.texto.screen.blit(self.texto.background_img,(0,0))
+                
+                if self.puntuacion > 450:
+                    self.texto.screen.blit(self.texto.background_image,(0,0))
+                
+                self.all_group.update(dt)
+                self.all_group.draw(self.texto.screen)     
+
+                self.asteroid_group.update(dt)
+                self.asteroid_group.draw(self.texto.screen)
+
+                self.texto.screen.blit(self.livescounter, (100, 10))
+                self.texto.screen.blit(self.marcador, (660, 10))
+            
+                rect = self.texto.text_gameOver.get_rect()
+                self.texto.screen.blit(self.texto.text_gameOver, ((800 - rect.w)//2, 130))
             rect = self.texto.text_return.get_rect()
-            
             
             self.texto.screen.blit(self.texto.text_rankings,(280,200))
             #if self.desactivar2:
@@ -281,7 +300,7 @@ class Juego():
                                 sys.exit()
             print(self.reiniciar)
             
-            if self.reiniciar > 1000:
+            if self.reiniciar > 200:
                 self.puntuacion = 0
                 self.asteroid_group.empty()
                 self.all_group.empty()
@@ -336,9 +355,29 @@ class Juego():
         
         color = color_inactive
         
-        done = False
+        
 
-        while not done:
+        while True:
+            if self.ship.lives== 0:
+                dt = self.clock.tick(FPS)
+                if self.puntuacion <= 450:
+                    self.texto.screen.blit(self.texto.background_img,(0,0))
+                
+                if self.puntuacion > 450:
+                    self.texto.screen.blit(self.texto.background_image,(0,0))
+                
+                self.all_group.update(dt)
+                self.all_group.draw(self.texto.screen)     
+
+                self.asteroid_group.update(dt)
+                self.asteroid_group.draw(self.texto.screen)
+
+                self.texto.screen.blit(self.livescounter, (100, 10))
+                self.texto.screen.blit(self.marcador, (660, 10))
+            
+                rect = self.texto.text_gameOver.get_rect()
+                self.texto.screen.blit(self.texto.text_gameOver, ((800 - rect.w)//2, 130))
+            
             for event in pg.event.get():
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
@@ -372,8 +411,7 @@ class Juego():
             pg.draw.rect(self.texto.screen, color, input_box, 2)
 
             pg.display.flip()
-            pg.display.update()
-
+            
     def level_1(self):
         while True:
 
