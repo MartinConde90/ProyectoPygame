@@ -333,7 +333,7 @@ class Juego():
         clock = pg.time.Clock()
         input_box = pg.Rect((800 - 70)//2, 100, 140, 32)
         color_inactive = pg.Color('lightskyblue3')
-        color_active = pg.Color('dodgerblue2')
+        
         color = color_inactive
         
         done = False
