@@ -1,4 +1,3 @@
-Iniciando proyecto
 
 -------------------------PROYECTO PYGAME: THE QUEST----------------------
 
