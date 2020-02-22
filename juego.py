@@ -121,7 +121,7 @@ class Juego():
             self.texto.screen.blit(self.texto.text_instructions,(20,560))
             self.texto.screen.blit(self.texto.text_story,(560,560))
             
-            self.ship.lives = 10
+            self.ship.lives = 5
             
             pg.display.update()
             for event in pg.event.get():
@@ -219,8 +219,10 @@ class Juego():
             print(self.reiniciar)
             dt = self.clock.tick(FPS)
             
+            
             if self.ship.lives== 0:
-                
+                self.planeta_group.empty()
+                self.planeta.kill()
                 if self.puntuacion <= 450:
                     self.texto.screen.blit(self.texto.background_img,(0,0))
                 
@@ -238,6 +240,9 @@ class Juego():
             
                 rect = self.texto.text_gameOver.get_rect()
                 self.texto.screen.blit(self.texto.text_gameOver, ((800 - rect.w)//2, 130))
+
+                rect = self.texto.text_try_again.get_rect()
+                self.texto.screen.blit(self.texto.text_try_again, ((800 - rect.w)//2, 560))
             rect = self.texto.text_return.get_rect()
             
             self.texto.screen.blit(self.texto.text_rankings,(280,200))
@@ -292,6 +297,8 @@ class Juego():
                                 self.all_group.add(self.ship)  
                                 self.reiniciar = 0 
                                 self.desactivar = True  
+                                self.planeta = Planeta()
+                                self.planeta_group.add(self.planeta)
                                 self.puntuacion = 0                                                           
                                 self.level_1()
                     if event.type == KEYDOWN:
@@ -301,6 +308,8 @@ class Juego():
             print(self.reiniciar)
             
             if self.reiniciar > 200:
+                self.planeta = Planeta()
+                self.planeta_group.add(self.planeta)
                 self.puntuacion = 0
                 self.asteroid_group.empty()
                 self.all_group.empty()
@@ -529,6 +538,7 @@ class Juego():
 
     def level_2(self):
         while True:
+            print(self.planeta_group)
             dt = self.clock.tick(FPS)
             self.reiniciar = 0    
             self.handleEvents()
@@ -604,7 +614,7 @@ class Juego():
                 if self.planeta.rect.x == 600:                
                     self.planeta_group.empty()
                     self.planeta.kill()
-                    self.texto.screen.blit(self.texto.Planet,(600,-50))
+                    #self.texto.screen.blit(self.texto.Planet,(600,-50))
                     self.aterrizaje()
                 
 
@@ -700,6 +710,7 @@ class Juego():
 
             rect = self.texto.text_gameOver.get_rect()
             self.texto.screen.blit(self.texto.text_gameOver, ((800 - rect.w)//2, 130))
+            
             
             
             #################
